@@ -1,3 +1,78 @@
+// ===========================================
+// PROTECTION: Right-Click and Developer Tools
+// ===========================================
+
+// 1. Disable right-click context menu
+document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+    return false;
+});
+
+// 2. Disable keyboard shortcuts for developer tools
+document.addEventListener('keydown', function(e) {
+    // Disable F12
+    if (e.key === 'F12') {
+        e.preventDefault();
+        return false;
+    }
+    
+    // Disable Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C
+    if (e.ctrlKey && e.shiftKey && ['I', 'i', 'J', 'j', 'C', 'c'].includes(e.key)) {
+        e.preventDefault();
+        return false;
+    }
+    
+    // Disable Ctrl+U (View Source)
+    if ((e.ctrlKey && e.key === 'u') || (e.ctrlKey && e.key === 'U')) {
+        e.preventDefault();
+        return false;
+    }
+    
+    // Additional common developer shortcuts
+    if (e.key === 'F11' || // Fullscreen
+        (e.ctrlKey && e.key === 's') || // Save
+        (e.ctrlKey && e.key === 'p') || // Print
+        (e.ctrlKey && e.shiftKey && e.key === 'P') // Browser's command palette
+    ) {
+        e.preventDefault();
+        return false;
+    }
+});
+
+// 3. Disable developer tools menu (for some browsers)
+Object.defineProperty(document, 'oncontextmenu', {
+    get() { return null; },
+    set() {}
+});
+
+// 4. Prevent opening developer tools by right-clicking on elements
+['contextmenu', 'mousedown', 'mouseup', 'keydown', 'keyup', 'keypress'].forEach(event => {
+    document.addEventListener(event, function(e) {
+        if (e.which === 123) { // F12
+            e.preventDefault();
+            return false;
+        }
+    }, true);
+});
+
+// 5. Prevent opening developer tools via browser menu
+if (window.console && window.console.firebug) {
+    console.clear();
+    document.body.innerHTML = '';
+}
+
+// 6. Prevent debugging by breaking into debugger
+setInterval(function() {
+    const startTime = performance.now();
+    debugger;
+    const endTime = performance.now();
+    if (endTime - startTime > 100) { // If debugger was opened
+        document.body.innerHTML = '';
+        window.close();
+        window.location.href = 'about:blank';
+    }
+}, 1000);
+
 // Preloader
 window.addEventListener('load', () => {
     const preloader = document.getElementById('preloader');
